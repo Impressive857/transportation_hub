@@ -40,6 +40,9 @@ void Solver::cbfn_solve(const Solver::Question::SharedPtr question) {
     RCLCPP_INFO(get_logger(), "src city:%d", question->src_city);
     RCLCPP_INFO(get_logger(), "dst city:%d", question->des_city);
 
+    m_city_map.clear();
+    m_answer.my_answer.clear();//必须clear，要不然每一次被判题机调用就会多数据
+
     // 初始化城市数据
     for (auto& info : question->infos) {
         RCLCPP_INFO(get_logger(), "src:%d, dst:%d, length:%d", info.source, info.destination, info.length);
@@ -65,7 +68,6 @@ void Solver::cbfn_solve(const Solver::Question::SharedPtr question) {
     }
 
     floyd();// floyd算法寻找路径
-    m_answer.my_answer.clear();//必须clear，要不然每一次被判题机调用就会多数据
     m_answer.my_answer.push_back(m_dst_city);//先放入终点城市
     for (int32_t mid = m_path_mat[m_src_city][m_dst_city]; mid != -1;) {//寻找中间的路经城市
         if (mid != m_src_city && mid != -1) {//如果中间城市就是起始城市就不加入
